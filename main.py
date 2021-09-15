@@ -1,16 +1,37 @@
-# This is a sample Python script.
+import pandas as pd
+import datetime as dt
+import pandas_datareader.data as web
+import requests
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+#2  Importing Data
 
+#2a Retreive Data fom online APIs
+#Example 1
+response = requests.get('https://api.github.com/events')
+print(response)
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+#Example 2
+api_request = requests.get('http://api.open-notify.org/astros.json')
 
+my_api_data = api_request.text
+mydatajson = api_request.json()
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+print(my_api_data)
+print(mydatajson)
+print(mydatajson["number"])
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+#Example 3
+start_date = dt.datetime(2019,11,2)
+end_date = dt.datetime(2020,9,11)
+
+stock_data = web.DataReader("NFLX", 'yahoo', start_date, end_date)
+print(stock_data)
+
+#2b Import a CSV file into a Pandas DataFrame
+crypto_data = pd.read_csv('all_currencies.csv')
+
+print(crypto_data.shape)
+print(crypto_data.info)
+
+print(crypto_data)
+
