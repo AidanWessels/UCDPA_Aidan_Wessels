@@ -3,13 +3,15 @@ import pandas as pd
 import datetime as dt
 import pandas_datareader.data as web
 import requests
+from cryptocompy import coin
 
 #2  Importing Data
 
 #2a Retreive Data fom online APIs
 #Example 1
-response = requests.get('https://api.github.com/events')
-print(response)
+response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+bitcoin_data = response.json()
+print(bitcoin_data)
 
 #Example 2
 api_request = requests.get('http://api.open-notify.org/astros.json')
@@ -27,6 +29,11 @@ end_date = dt.datetime(2020,9,11)
 
 stock_data = web.DataReader("NFLX", 'yahoo', start_date, end_date)
 print(stock_data)
+
+#Example 4 - This will be used later when analysing lists and dictionaries
+coin_data = coin.get_coin_list()
+symbols = list(coin_data.keys())
+print(symbols)
 
 #2b Import a CSV file into a Pandas DataFrame
 crypto_data = pd.read_csv('all_currencies.csv')
@@ -106,3 +113,16 @@ print(fill_missiing_data(grouped_data))
 print(np.sort(data.Symbol.unique()))
 
 #4c Dictionary or Lists
+
+coin_data = coin.get_coin_list()
+symbols = list(coin_data.keys())
+
+coin_list = coin.get_coin_list(coins=["BTC", "ETH"])
+
+print(coin_list)
+print(symbols[:1])
+
+print(coin_data['BTCD'])
+
+company = coin_data.get('MTCE', 'MISSING')
+print(company)
