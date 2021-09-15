@@ -4,6 +4,7 @@ import datetime as dt
 import pandas_datareader.data as web
 import requests
 from cryptocompy import coin
+from cryptocompy import price
 
 #2  Importing Data
 
@@ -115,14 +116,24 @@ print(np.sort(data.Symbol.unique()))
 #4c Dictionary or Lists
 
 coin_data = coin.get_coin_list()
-symbols = list(coin_data.keys())
+cryto_symbols = list(coin_data.keys())
 
-coin_list = coin.get_coin_list(coins=["BTC", "ETH"])
+#Print the complete list of Cryptocurrency symbols
+print(cryto_symbols)
+#Pring only the first 5 symbols in the coin_data symbols list
+print(cryto_symbols[:5])
 
-print(coin_list)
-print(symbols[:1])
+#Get coin data for AMC and CRYPT
+coin_data_amc_crypt = coin.get_coin_list(coins=["AMC", "CRYPT"])
+print(coin_data_amc_crypt)
 
-print(coin_data['BTCD'])
+#Get coin data for LTCX
+print(coin_data['LTCX'])
 
+#Find coin data for coin = MTCE where no data available print 'MISSING'
 company = coin_data.get('MTCE', 'MISSING')
 print(company)
+
+#Get Bitcoins latest prices relative to EUR, USD, BTCD and BTCE
+bitcoin_prices = price.get_current_price("BTC", ["EUR", "USD", "BTCD", "BTCE"])
+print(bitcoin_prices)
