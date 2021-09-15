@@ -1,103 +1,116 @@
 import numpy as np
 import pandas as pd
-import datetime as dt
+from datetime import datetime as dt, timedelta
 import pandas_datareader.data as web
 import requests
 from cryptocompy import coin
 from cryptocompy import price
+import matplotlib.pyplot as plt
 
 #2  Importing Data
 
 #2a Retreive Data fom online APIs
-#Example 1
+#Example 1 Get up to date Bitcoin data
 response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
 bitcoin_data = response.json()
+#Print the results
 print(bitcoin_data)
 
-#Example 2
+#Example 2 Get up to date ISS data
 api_request = requests.get('http://api.open-notify.org/astros.json')
 
 my_api_data = api_request.text
 mydatajson = api_request.json()
 
+#Print the results
 print(my_api_data)
 print(mydatajson)
 print(mydatajson["number"])
 
-#Example 3
+#Example 3 Retrieve up Stock data over a period - uses DataReader
 start_date = dt.datetime(2019,11,2)
 end_date = dt.datetime(2020,9,11)
 
 stock_data = web.DataReader("NFLX", 'yahoo', start_date, end_date)
+#Print the results
 print(stock_data)
 
 #Example 4 - This will be used later when analysing lists and dictionaries
 coin_data = coin.get_coin_list()
 symbols = list(coin_data.keys())
+#Print the results
 print(symbols)
 
 #2b Import a CSV file into a Pandas DataFrame
-crypto_data = pd.read_csv('all_currencies.csv')
-
-print(crypto_data.shape)
-print(crypto_data.info)
-
-print(crypto_data)
-
-
 data = pd.read_csv('all_currencies.csv')
 data2 = pd.read_csv('crypto_prices.csv')
 
+#Print data relating to our dataset 'all_currencies.csv'
+print(data.shape)
+print(data.info)
+print(data)
+
+#Print data relating to our dataset 'crypto_prices.csv'
+print(data2.shape)
+print(data2.info)
+print(data2)
+
 #3 Analysing Data
-#3a.1. Sort
+#3a.1. Sort - Data sorted by Date and High prices
 data_date_sort = data.sort_values(by=['Date'], axis=0, na_position='last')
 data_high_sort = data.sort_values(by=['High'], axis=0, ascending = 0, na_position='last')
 
+#Print the results
 print(data_date_sort)
 print(data_high_sort[['Date','High','Symbol']])
 
-#3a.2 Index
+#3a.2 Index - Using index return only records where the Symbol == 'NANOX'
 indexed_data = data.index[data['Symbol'] == 'NANOX']
 
-#print(data[indexed_data])
+#Print the results
+print(data[indexed_data])
 
-#3a.3 Group
+#3a.3 Group - Group data where the Symbol is not equal to '$$$'
 grouped_data = data[(data.Symbol != '$$$')]
+#3a.3 Group - Group data by Symbol for the max High price attained.
 data_highest_per_currency = data[data.groupby('Symbol').High.transform('max') == data['High']]
 
+#Print the results
 print(grouped_data)
 print(data_highest_per_currency[['Date','Symbol','High']])
 
-#3b Replacing missing values
-
+#3b Replacing missing values - using teh fillna bfill and ffill functions
 data[['Market Cap']] = data[['Market Cap']].fillna(method="bfill",axis=0).fillna(method="ffill",axis=0)
 
+#Print the results
 print(data)
 
-#3c Looping, iterrows
-
+#3c Looping, iterrows - use a for loop to calculate the 'Circulating Supply' for each row
 #NOTE - Running this is very computationally heavy
 for label, row in data.iterrows():
     data.loc[label,'Circulating Supply'] = row['Market Cap']/row['Close']
+#Print the results
 print(data)
 
 #3d Merge DataFrames
-
+#Rename the Date column in the dataset to match that of dataset 1
 data2.rename(columns={"DateTime": "Date"}, inplace=True)
+#Convert the datatypes so that they match for both the datasets
 data['Date'] = pd.to_datetime(data['Date'])
 data2['Date']= pd.to_datetime(data2['Date'])
 data2['Date'] = pd.to_datetime(data2["Date"].dt.strftime('%Y-%m-%d'))
 
+#Extract only the records where the Symbol is ETH for both datasets
 ETH_data = data[(data['Symbol']=='ETH')]
 ETH_data2 = data2[(data2['Symbol']=='ETH')]
 
-
+#Merge the datasets
 ETH_merged_data = ETH_data.merge(ETH_data2, how='inner', left_on=["Symbol","Date"], right_on=["Symbol","Date"])
+#Print the results
 print(ETH_merged_data.head())
 
-
 #4a_Define a custom function to create reuseable code
-
+#Extract only the records where the Symbol = '$$$'
 grouped_data = data[(data.Symbol == '$$$')]
 
 def fill_missiing_data(data, fillvalue=0):
@@ -107,10 +120,11 @@ def fill_missiing_data(data, fillvalue=0):
             data['Market Cap'][i] = fillvalue
     return(data)
 
+#Print the results
 print(fill_missiing_data(grouped_data))
 
 #4b Numpy
-
+#Print a list of the unique Symbols in the dataset
 print(np.sort(data.Symbol.unique()))
 
 #4c Dictionary or Lists
@@ -183,6 +197,5 @@ plt.plot(last_year_btc_data['Date'],last_year_btc_data['Close'], color = 'orange
 plt.xlabel('Date')
 plt.ylabel('Closing Price')
 plt.title('BTC Data over the most recent year only')
-
 
 plt.show()
