@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import datetime as dt
 import pandas_datareader.data as web
@@ -85,3 +86,23 @@ ETH_data2 = data2[(data2['Symbol']=='ETH')]
 
 ETH_merged_data = ETH_data.merge(ETH_data2, how='inner', left_on=["Symbol","Date"], right_on=["Symbol","Date"])
 print(ETH_merged_data.head())
+
+
+#4a_Define a custom function to create reuseable code
+
+grouped_data = data[(data.Symbol == '$$$')]
+
+def fill_missiing_data(data, fillvalue=0):
+    data = data.copy()
+    for i, value in enumerate(data['Market Cap'].values):
+        if np.isnan(value):
+            data['Market Cap'][i] = fillvalue
+    return(data)
+
+print(fill_missiing_data(grouped_data))
+
+#4b Numpy
+
+print(np.sort(data.Symbol.unique()))
+
+#4c Dictionary or Lists
