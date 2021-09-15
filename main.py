@@ -137,3 +137,52 @@ print(company)
 #Get Bitcoins latest prices relative to EUR, USD, BTCD and BTCE
 bitcoin_prices = price.get_current_price("BTC", ["EUR", "USD", "BTCD", "BTCE"])
 print(bitcoin_prices)
+
+
+#Ensure 'Date' column is converted to datatype 'datetime'
+data['Date'] = pd.to_datetime(data['Date'])
+dope_data = data[(data.Symbol == 'DOPE')]
+btc_data = data[(data.Symbol == 'BTC')]
+
+#Find the start date of the dataset where currency symbol = DOPE
+start_date = dope_data['Date'].min()
+#Find the end date of the dataset where currency symbol = DOPE
+end_date = dope_data['Date'].max()
+#Find the start date of the last year of the dataset where currency symbol = DOPE
+last_year = end_date - timedelta(days=365)
+
+full_data_mask = (dope_data['Date'] > start_date) & (dope_data['Date'] <= end_date)
+full_dope_data = dope_data.loc[full_data_mask]
+
+last_year_data_mask = (dope_data['Date'] > last_year) & (dope_data['Date'] <= end_date)
+last_year_dope_data = dope_data.loc[last_year_data_mask]
+
+last_year_data_mask = (btc_data['Date'] > last_year) & (btc_data['Date'] <= end_date)
+last_year_btc_data = btc_data.loc[last_year_data_mask]
+
+#Create Figure 1
+plt.figure(1)
+plt.plot(full_dope_data['Date'],full_dope_data['Close'], color = 'red')
+#Add Labels
+plt.xlabel('Date')
+plt.ylabel('Closing Price')
+plt.title('DOPE Data over the Entire Dataset')
+
+#Create Figure 2
+plt.figure(2)
+plt.plot(last_year_dope_data['Date'],last_year_dope_data['Close'], color = 'green')
+#Add Labels
+plt.xlabel('Date')
+plt.ylabel('Closing Price')
+plt.title('DOPE Data over the most recent year only')
+
+#Create Figure 3
+plt.figure(3)
+plt.plot(last_year_btc_data['Date'],last_year_btc_data['Close'], color = 'orange')
+#Add Labels
+plt.xlabel('Date')
+plt.ylabel('Closing Price')
+plt.title('BTC Data over the most recent year only')
+
+
+plt.show()
