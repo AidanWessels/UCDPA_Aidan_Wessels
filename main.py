@@ -74,9 +74,9 @@ data_highest_per_currency = data[data.groupby('Symbol').High.transform('max') ==
 print(data_highest_per_currency[['Date','Symbol','High']])
 
 #3b Replacing missing values - using teh fillna bfill and ffill functions
-data[['Market Cap']] = data[['Market Cap']].fillna(method="bfill",axis=0).fillna(method="ffill",axis=0)
+data[['Market Cap']] = data[['Market Cap']].fillna(method="bfill",axis=0)
 #This is done for the Bitcoin only data aswell, which will be used in 3c to calcualte 'Circulating Supply'
-grouped_BTC_data[['Market Cap']] = grouped_BTC_data[['Market Cap']].fillna(method="bfill",axis=0).fillna(method="ffill",axis=0)
+grouped_BTC_data[['Market Cap']] = grouped_BTC_data[['Market Cap']].fillna(method="bfill",axis=0)
 
 #Print the results
 print(data)
