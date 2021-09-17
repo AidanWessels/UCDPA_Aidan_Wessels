@@ -59,24 +59,28 @@ indexed_data = data.index[data['Symbol'] == 'NANOX']
 #Print the results
 print(data[indexed_data])
 
-#3a.3 Group - Group data where the Symbol is not equal to '$$$'
+#3a.3 Group - Group data where the Symbol is NOT equal to '$$$' and where the Symbol is BTC ONLY.
 grouped_data = data[(data.Symbol != '$$$')]
-grouped_BTC_data = data[(data.Symbol != 'BTC')]
+grouped_BTC_data = data[(data.Symbol == 'BTC')]
 
+#Print the results
 print(grouped_data)
 print(grouped_BTC_data)
+
 #3a.3 Group - Group data by Symbol for the max High price attained.
 data_highest_per_currency = data[data.groupby('Symbol').High.transform('max') == data['High']]
 
 #Print the results
-
 print(data_highest_per_currency[['Date','Symbol','High']])
 
 #3b Replacing missing values - using teh fillna bfill and ffill functions
 data[['Market Cap']] = data[['Market Cap']].fillna(method="bfill",axis=0).fillna(method="ffill",axis=0)
+#This is done for the Bitcoin only data aswell, which will be used in 3c to calcualte 'Circulating Supply'
+grouped_BTC_data[['Market Cap']] = grouped_BTC_data[['Market Cap']].fillna(method="bfill",axis=0).fillna(method="ffill",axis=0)
 
 #Print the results
 print(data)
+print(grouped_BTC_data)
 
 #3c Looping, iterrows - use a for loop to calculate the 'Circulating Supply' for each row of Bitcoin data
 #NOTE - Running this is very computationally heavy
