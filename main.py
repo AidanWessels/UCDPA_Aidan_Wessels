@@ -61,11 +61,15 @@ print(data[indexed_data])
 
 #3a.3 Group - Group data where the Symbol is not equal to '$$$'
 grouped_data = data[(data.Symbol != '$$$')]
+grouped_BTC_data = data[(data.Symbol != 'BTC')]
+
+print(grouped_data)
+print(grouped_BTC_data)
 #3a.3 Group - Group data by Symbol for the max High price attained.
 data_highest_per_currency = data[data.groupby('Symbol').High.transform('max') == data['High']]
 
 #Print the results
-print(grouped_data)
+
 print(data_highest_per_currency[['Date','Symbol','High']])
 
 #3b Replacing missing values - using teh fillna bfill and ffill functions
@@ -74,12 +78,12 @@ data[['Market Cap']] = data[['Market Cap']].fillna(method="bfill",axis=0).fillna
 #Print the results
 print(data)
 
-#3c Looping, iterrows - use a for loop to calculate the 'Circulating Supply' for each row
+#3c Looping, iterrows - use a for loop to calculate the 'Circulating Supply' for each row of Bitcoin data
 #NOTE - Running this is very computationally heavy
-for label, row in data.iterrows():
-    data.loc[label,'Circulating Supply'] = row['Market Cap']/row['Close']
+for label, row in grouped_BTC_data.iterrows():
+    grouped_BTC_data.loc[label,'Circulating Supply'] = row['Market Cap']/row['Close']
 #Print the results
-print(data)
+print(grouped_BTC_data)
 
 #3d Merge DataFrames
 #Rename the Date column in the dataset to match that of dataset 1
