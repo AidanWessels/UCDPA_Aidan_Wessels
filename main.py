@@ -14,20 +14,9 @@ import matplotlib.pyplot as plt
 response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
 bitcoin_data = response.json()
 #Print the results
-print(bitcoin_data)
+print(bitcoin_data
 
-#Example 2 Get up to date ISS data
-api_request = requests.get('http://api.open-notify.org/astros.json')
-
-my_api_data = api_request.text
-mydatajson = api_request.json()
-
-#Print the results
-print(my_api_data)
-print(mydatajson)
-print(mydatajson["number"])
-
-#Example 3 Retrieve up Stock data over a period - uses DataReader
+#Example 2 Retrieve up Stock data over a period - uses DataReader
 start_date = dt.datetime(2019,11,2)
 end_date = dt.datetime(2020,9,11)
 
@@ -35,7 +24,7 @@ stock_data = web.DataReader("NFLX", 'yahoo', start_date, end_date)
 #Print the results
 print(stock_data)
 
-#Example 4 - This will be used later when analysing lists and dictionaries
+#Example 3 - This will be used later when analysing lists and dictionaries
 coin_data = coin.get_coin_list()
 symbols = list(coin_data.keys())
 #Print the results
@@ -152,7 +141,7 @@ print(company)
 bitcoin_prices = price.get_current_price("BTC", ["EUR", "USD", "BTCD", "BTCE"])
 print(bitcoin_prices)
 
-
+#5 Visualise
 #Ensure 'Date' column is converted to datatype 'datetime'
 data['Date'] = pd.to_datetime(data['Date'])
 dope_data = data[(data.Symbol == 'DOPE')]
