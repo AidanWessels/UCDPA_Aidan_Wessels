@@ -151,7 +151,6 @@ print(bitcoin_prices)
 
 #5 Visualise
 data = pd.read_csv('all_currencies.csv')
-data2 = pd.read_csv('crypto_prices.csv')
 
 #Ensure 'Date' column is converted to datatype 'datetime'
 data['Date'] = pd.to_datetime(data['Date'])
@@ -165,59 +164,78 @@ end_date = LTC_data['Date'].max()
 #Find the start date of the last year of the dataset where currency symbol = DOPE
 last_year = end_date - timedelta(days=365)
 
-full_data_mask = (LTC_data['Date'] > start_date) & (LTC_data['Date'] <= end_date)
-full_LTC_data = LTC_data.loc[full_data_mask]
+full_LTC_data = LTC_data.loc[(LTC_data['Date'] > start_date) & (LTC_data['Date'] <= end_date)]
+full_BCH_data = BCH_data.loc[(BCH_data['Date'] > start_date) & (BCH_data['Date'] <= end_date)]
 
-last_year_data_mask = (LTC_data['Date'] > last_year) & (LTC_data['Date'] <= end_date)
-last_year_LTC_data = LTC_data.loc[last_year_data_mask]
-
-last_year_data_mask = (BCH_data['Date'] > last_year) & (BCH_data['Date'] <= end_date)
-last_year_BCH_data = BCH_data.loc[last_year_data_mask]
+last_year_LTC_data = LTC_data.loc[(LTC_data['Date'] > last_year) & (LTC_data['Date'] <= end_date)]
+last_year_BCH_data = BCH_data.loc[(BCH_data['Date'] > last_year) & (BCH_data['Date'] <= end_date)]
 
 #Create Figure 1
 plt.figure(1)
-plt.plot(full_LTC_data['Date'],full_LTC_data['Close'], color = 'red')
+plt.plot(full_LTC_data['Date'],full_LTC_data['Close'], color = 'red', label="Litecoin")
+plt.plot(full_BCH_data['Date'],full_BCH_data['Close'], color = 'green', label="Bitcoin Cash")
 #Add Labels
 plt.xlabel('Date')
 plt.ylabel('Closing Price')
-plt.title('LTC Data over the Entire Dataset')
+plt.title('LTC & BCH Data over the Entire Dataset')
+plt.legend()
 plt.xticks(rotation = 45)
 
 #Create Figure 2
 plt.figure(2)
-plt.plot(last_year_LTC_data['Date'],last_year_LTC_data['Close'], color = 'green')
+plt.plot(last_year_LTC_data['Date'],last_year_LTC_data['Close'], color = 'red', label="Litecoin")
+plt.plot(last_year_BCH_data['Date'],last_year_BCH_data['Close'], color = 'green', label="Bitcoin Cash")
 #Add Labels
 plt.xlabel('Date')
 plt.ylabel('Closing Price')
-plt.title('LTC Data over the most recent year only')
+plt.title('LTC & BCH Data over over the most recent year only')
+plt.legend()
 plt.xticks(rotation = 45)
 
 #Create Figure 3
 plt.figure(3)
-plt.plot(last_year_BCH_data['Date'],last_year_BCH_data['Close'], color = 'orange')
+plt.plot(last_year_LTC_data['Date'],last_year_LTC_data['Close'], color = 'red', label="Litecoin")
+plt.plot(last_year_BCH_data['Date'],last_year_BCH_data['Close'], color = 'green', label="Bitcoin Cash")
 #Add Labels
 plt.xlabel('Date')
 plt.ylabel('Closing Price')
-plt.title('BCH Data over the most recent year only')
+plt.title('LTC & BCH Data over over the most recent year only - Logarithmic Scale')
+plt.legend()
+plt.yscale('log')
 plt.xticks(rotation = 45)
 
+
 #With the dataset available we have only a records up to 2018-09-27, this would not include valuable data regarding the COVID-19 pandemic.
-#Therefore it would be of further interest to bring in the prices for DOPE and BTC since the begining of 2019.
+#Therefore it would be of further interest to bring in the prices for LTC and BCH since the begining of 2019.
 today = dt.now()
 start = dt(2019,1,2)
 #Determine the number of days since 2019-01-01 to use in the get_historical_data call
 delta = today - start
 
 latest_LTC_data = price.get_historical_data('LTC', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
-latest_BTC_data = price.get_historical_data('BCH', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
+latest_BCH_data = price.get_historical_data('BCH', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
 
-#Get historical prices for DOPE coin
+#Get historical prices for LTC
 latest_LTC_prices = pd.DataFrame(latest_LTC_data,columns=['time', 'close'])
 latest_LTC_prices['time'] = pd.to_datetime(latest_LTC_prices['time'])
 
-#Get historical prices for Bitcoin coin
-latest_BCH_prices = pd.DataFrame(latest_BTC_data,columns=['time', 'close'])
+#Get historical prices for BCH
+latest_BCH_prices = pd.DataFrame(latest_BCH_data,columns=['time', 'close'])
 latest_BCH_prices['time'] = pd.to_datetime(latest_BCH_prices['time'])
+
+
+
+#Create Figure 4
+plt.figure(4)
+plt.plot(latest_LTC_prices['time'],latest_LTC_prices['close'], color = 'red', label="Litecoin")
+plt.plot(latest_BCH_prices['time'],latest_BCH_prices['close'], color = 'green', label="Bitcoin Cash")
+#Add Labels
+plt.xlabel('Date')
+plt.ylabel('Closing Price')
+plt.title('LTC & BCH Data since 2019')
+plt.legend()
+plt.xticks(rotation = 45)
+
 
 #It would also be useful to do a comparison between Bitcoin and a traditional 'strong' stock
 #Get historical prices for Microsoft using DataReader
@@ -246,54 +264,37 @@ aapl_data['dates'] = dates
 #Convert the new 'dates' column to type 'datetime'
 aapl_data['dates'] = pd.to_datetime(aapl_data['dates'])
 
-
-#Create Figure 4
-plt.figure(4)
-plt.plot(latest_LTC_prices['time'],latest_LTC_prices['close'], color = 'blue', markevery=100)
-#Add Labels
-plt.xlabel('Date')
-plt.ylabel('Closing Price')
-plt.title('LTC Data since 2019')
-plt.xticks(rotation = 45)
-
 #Create Figure 5
 plt.figure(5)
-plt.plot(latest_BCH_prices['time'],latest_BCH_prices['close'], color = 'yellow', markevery=100)
+plt.plot(ms_data['dates'],ms_data['Close'], color = 'yellow', markevery=100, label="Microsoft")
+plt.plot(aapl_data['dates'],aapl_data['Close'], color = 'blue', markevery=100, label="Apple")
 #Add Labels
 plt.xlabel('Date')
 plt.ylabel('Closing Price')
-plt.title('BCH Data since 2019')
+plt.title('Microsoft and Apple Closing prices since 2019')
+plt.legend()
 plt.xticks(rotation = 45)
 
-#Create Figure 6
-plt.figure(6)
-plt.plot(ms_data['dates'],ms_data['Close'], color = 'red', markevery=100)
-#Add Labels
-plt.xlabel('Date')
-plt.ylabel('Closing Price')
-plt.title('Microsoft Data since 2019')
-plt.xticks(rotation = 45)
-
+#Combine the datasets for stocks and Crytocurrencies
 #Create Figure 7
-plt.figure(7)
-plt.plot(ms_data['dates'],ms_data['Close'], color = 'red', markevery=100, label="Microsoft")
-plt.plot(aapl_data['dates'],aapl_data['Close'], color = 'green', markevery=100, label="Apple")
-plt.plot(latest_BCH_prices['time'],latest_BCH_prices['close'], color = 'yellow', markevery=100, label="Bitcoin Cash")
-plt.plot(latest_LTC_prices['time'],latest_LTC_prices['close'], color = 'blue', markevery=100, label="LiteCoin")
+plt.figure(6)
+plt.plot(ms_data['dates'],ms_data['Close'], color = 'yellow', markevery=100, label="Microsoft")
+plt.plot(aapl_data['dates'],aapl_data['Close'], color = 'blue', markevery=100, label="Apple")
+plt.plot(latest_LTC_prices['time'],latest_LTC_prices['close'], color = 'red', markevery=100, label="LiteCoin")
+plt.plot(latest_BCH_prices['time'],latest_BCH_prices['close'], color = 'green', markevery=100, label="Bitcoin Cash")
 #Add Labels
 plt.xlabel('Date')
 plt.ylabel('Closing Price')
 plt.title('Stock Prices vs Cryptocurrency Prices')
 plt.xticks(rotation = 45)
 plt.legend()
-plt.show()
 
-#Create Figure 8
-plt.figure(8)
-plt.plot(ms_data['dates'],ms_data['Close'], color = 'red', markevery=100, label="Microsoft")
-plt.plot(aapl_data['dates'],aapl_data['Close'], color = 'green', markevery=100, label="Apple")
-plt.plot(latest_BCH_prices['time'],latest_BCH_prices['close'], color = 'yellow', markevery=100, label="Bitcoin Cash")
-plt.plot(latest_LTC_prices['time'],latest_LTC_prices['close'], color = 'blue', markevery=100, label="LiteCoin")
+#Create Figure 7
+plt.figure(7)
+plt.plot(ms_data['dates'],ms_data['Close'], color = 'yellow', markevery=100, label="Microsoft")
+plt.plot(aapl_data['dates'],aapl_data['Close'], color = 'blue', markevery=100, label="Apple")
+plt.plot(latest_LTC_prices['time'],latest_LTC_prices['close'], color = 'red', markevery=100, label="LiteCoin")
+plt.plot(latest_BCH_prices['time'],latest_BCH_prices['close'], color = 'green', markevery=100, label="Bitcoin Cash")
 #Add Labels
 plt.xlabel('Date')
 plt.ylabel('Closing Price')
@@ -301,4 +302,49 @@ plt.title('Stock Prices vs Cryptocurrency Prices - Logarithmic Scale')
 plt.xticks(rotation = 45)
 plt.yscale('log')
 plt.legend()
+
+
+today = dt.now()
+start = dt(2019,1,2)
+#Determine the number of days since 2019-01-01 to use in the get_historical_data call
+delta = today - start
+
+latest_ETH_data = price.get_historical_data('ETH', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
+latest_BTC_data = price.get_historical_data('BTC', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
+latest_ADA_data = price.get_historical_data('ADA', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
+latest_UNI_data = price.get_historical_data('UNI', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
+latest_DOGE_data = price.get_historical_data('DOGE', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
+
+
+#Get historical prices for ETH
+latest_ETH_prices = pd.DataFrame(latest_ETH_data,columns=['time', 'close'])
+latest_ETH_prices['time'] = pd.to_datetime(latest_ETH_prices['time'])
+#Get historical prices for BTC
+latest_BTC_prices = pd.DataFrame(latest_BTC_data,columns=['time', 'close'])
+latest_BTC_prices['time'] = pd.to_datetime(latest_BTC_prices['time'])
+#Get historical prices for ADA
+latest_ADA_prices = pd.DataFrame(latest_ADA_data,columns=['time', 'close'])
+latest_ADA_prices['time'] = pd.to_datetime(latest_ADA_prices['time'])
+#Get historical prices for UNI
+latest_UNI_prices = pd.DataFrame(latest_UNI_data,columns=['time', 'close'])
+latest_UNI_prices['time'] = pd.to_datetime(latest_UNI_prices['time'])
+#Get historical prices for DOGE
+latest_DOGE_prices = pd.DataFrame(latest_DOGE_data,columns=['time', 'close'])
+latest_DOGE_prices['time'] = pd.to_datetime(latest_DOGE_prices['time'])
+
+#Create Figure 8
+plt.figure(8)
+plt.plot(latest_ETH_prices['time'],latest_ETH_prices['close'], color = 'red', markevery=100, label="Etherium")
+plt.plot(latest_BTC_prices['time'],latest_BTC_prices['close'], color = 'green', markevery=100, label="Bitcoin")
+plt.plot(latest_ADA_prices['time'],latest_ADA_prices['close'], color = 'blue', markevery=100, label="Cardano")
+plt.plot(latest_UNI_prices['time'],latest_UNI_prices['close'], color = 'yellow', markevery=100, label="Uniswap")
+plt.plot(latest_DOGE_prices['time'],latest_DOGE_prices['close'], color = 'orange', markevery=100, label="Dogecoin")
+#Add Labels
+plt.xlabel('Date')
+plt.ylabel('Closing Price')
+plt.title('Cryptocurrency Prices - Logarithmic Scale')
+plt.xticks(rotation = 45)
+plt.yscale('log')
+plt.legend()
+
 plt.show()
