@@ -150,6 +150,7 @@ bitcoin_prices = price.get_current_price("BTC", ["EUR", "USD", "BTCD", "BTCE"])
 print(bitcoin_prices)
 
 #5 Visualise
+#Reimport the original DataFrame
 data = pd.read_csv('all_currencies.csv')
 
 #Ensure 'Date' column is converted to datatype 'datetime'
@@ -315,7 +316,6 @@ latest_ADA_data = price.get_historical_data('ADA', 'USD', 'day', info='close', a
 latest_UNI_data = price.get_historical_data('UNI', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
 latest_DOGE_data = price.get_historical_data('DOGE', 'USD', 'day', info='close', aggregate=1, limit=delta.days)
 
-
 #Get historical prices for ETH
 latest_ETH_prices = pd.DataFrame(latest_ETH_data,columns=['time', 'close'])
 latest_ETH_prices['time'] = pd.to_datetime(latest_ETH_prices['time'])
@@ -332,6 +332,12 @@ latest_UNI_prices['time'] = pd.to_datetime(latest_UNI_prices['time'])
 latest_DOGE_prices = pd.DataFrame(latest_DOGE_data,columns=['time', 'close'])
 latest_DOGE_prices['time'] = pd.to_datetime(latest_DOGE_prices['time'])
 
+#NOTE this is definitely not the best way to do this. This method was only employed due to time constraints and simplicity - it is computationaly heavy and messy coding.
+merged_data = latest_ETH_prices.merge(latest_ADA_prices, how='inner', left_on=["time"], right_on=["time"])
+merged_data = merged_data.merge(latest_UNI_prices, how='inner', left_on=["time"], right_on=["time"])
+merged_data = merged_data.merge(latest_DOGE_prices, how='inner', left_on=["time"], right_on=["time"])
+merged_data['Total']= merged_data.sum(axis=1)
+
 #Create Figure 8
 plt.figure(8)
 plt.plot(latest_ETH_prices['time'],latest_ETH_prices['close'], color = 'red', markevery=100, label="Etherium")
@@ -347,4 +353,25 @@ plt.xticks(rotation = 45)
 plt.yscale('log')
 plt.legend()
 
-plt.show()
+#Create Figure 9
+plt.figure(9)
+plt.plot(latest_BTC_prices['time'],latest_BTC_prices['close'], color = 'green', markevery=100, label="Bitcoin")
+plt.plot(merged_data['time'],merged_data['Total'], color = 'red', markevery=100, label="Top 4 Currencies excluding Bitcoin")
+#Add Labels
+plt.xlabel('Date')
+plt.ylabel('Closing Price')
+plt.title('Cryptocurrency Prices - Logarithmic Scale')
+plt.xticks(rotation = 45)
+plt.yscale('log')
+plt.legend()
+
+#Create Figure 10
+plt.figure(10)
+plt.bar(latest_BTC_prices['time'],latest_BTC_prices['close'], color = 'green', label="Bitcoin")
+plt.bar(merged_data['time'],merged_data['Total'], color = 'red', label="Top 4 Currencies excluding Bitcoin", bottom = latest_BTC_prices['close'])
+#Add Labels
+plt.xlabel('Date')
+plt.ylabel('Closing Price')
+plt.title('Cryptocurrency Prices - Logarithmic Scale')
+plt.xticks(rotation = 45)
+plt.legend()
