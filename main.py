@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from datetime import datetime as dt, timedelta
+import datetime as dt
 import pandas_datareader.data as web
 import requests
 from cryptocompy import coin
@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
 bitcoin_data = response.json()
 #Print the results
-print(bitcoin_data
+print(bitcoin_data)
 
 #Example 2 Retrieve up Stock data over a period - uses DataReader
 start_date = dt.datetime(2019,11,2)
@@ -57,7 +57,7 @@ print(data_high_sort[['Date','High','Symbol']])
 indexed_data = data.index[data['Symbol'] == 'NANOX']
 
 #Print the results
-print(data[indexed_data])
+print(indexed_data)
 
 #3a.3 Group - Group data where the Symbol is NOT equal to '$$$' and where the Symbol is BTC ONLY.
 grouped_data = data[(data.Symbol != '$$$')]
@@ -83,7 +83,7 @@ print(data)
 print(grouped_BTC_data)
 
 #3c Looping, iterrows - use a for loop to calculate the 'Circulating Supply' for each row of Bitcoin data
-#NOTE - Running this is very computationally heavy
+#NOTE - Running this is will give warnings
 for label, row in grouped_BTC_data.iterrows():
     grouped_BTC_data.loc[label,'Circulating Supply'] = row['Market Cap']/row['Close']
 #Print the results
@@ -150,6 +150,7 @@ bitcoin_prices = price.get_current_price("BTC", ["EUR", "USD", "BTCD", "BTCE"])
 print(bitcoin_prices)
 
 #5 Visualise
+from datetime import datetime as dt, timedelta
 #Reimport the original DataFrame
 data = pd.read_csv('all_currencies.csv')
 
@@ -332,7 +333,8 @@ latest_UNI_prices['time'] = pd.to_datetime(latest_UNI_prices['time'])
 latest_DOGE_prices = pd.DataFrame(latest_DOGE_data,columns=['time', 'close'])
 latest_DOGE_prices['time'] = pd.to_datetime(latest_DOGE_prices['time'])
 
-#NOTE this is definitely not the best way to do this. This method was only employed due to time constraints and simplicity - it is computationaly heavy and messy coding.
+#NOTE this is not the best way to do this. This method was only employed due to time constraints and simplicity - it is computationaly heavy and messy coding.
+#NOTE - Running this is will give warnings
 merged_data = latest_ETH_prices.merge(latest_ADA_prices, how='inner', left_on=["time"], right_on=["time"])
 merged_data = merged_data.merge(latest_UNI_prices, how='inner', left_on=["time"], right_on=["time"])
 merged_data = merged_data.merge(latest_DOGE_prices, how='inner', left_on=["time"], right_on=["time"])
@@ -375,3 +377,5 @@ plt.ylabel('Closing Price')
 plt.title('Cryptocurrency Prices - Logarithmic Scale')
 plt.xticks(rotation = 45)
 plt.legend()
+
+plt.show()
